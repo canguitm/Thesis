@@ -4,4 +4,9 @@
     <string name="enter_message_here">Enter message here...</string>
     <string name="title_activity_maps">Map</string>
     <string name="report">report</string>
+    <string name="light">Light</string>
+    <string name="moderate">Moderate</string>
+    <string name="heavy">Heavy</string>
+    <string name="severity_of_traffic">Severity of Traffic</string>
+    <string name="cause_of_traffic">Cause of Traffic</string>
 </resources>

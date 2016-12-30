@@ -15,6 +15,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 
@@ -22,17 +24,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
-
+    private RadioGroup radioSeverityGroup, radioCauseGroup;
+    private RadioButton radioSeverityButton, radioCauseButton;
     private Button b_get;
     private TrackGPS gps;
     double longitude;
     double latitude;
 
     String mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
-
-    //DEL
-    EditText input1;
-    EditText input2;
 
     ArrayList<String> smsMessagesList = new ArrayList<>();
     ListView messages;
@@ -57,10 +56,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         messages = (ListView) findViewById(R.id.messages);
-
-        //DEL
-        input1 = (EditText) findViewById(R.id.input1);
-        input2 = (EditText) findViewById(R.id.input2);
+        radioSeverityGroup=(RadioGroup)findViewById(R.id.severity);
+        radioCauseGroup=(RadioGroup)findViewById(R.id.cause);
 
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, smsMessagesList);
         messages.setAdapter(arrayAdapter);
@@ -152,8 +149,15 @@ public class MainActivity extends AppCompatActivity {
                 != PackageManager.PERMISSION_GRANTED) {
             getPermissionToReadSMS();
         } else {
+
+            int selectSeverity=radioSeverityGroup.getCheckedRadioButtonId();
+            int selectCause=radioCauseGroup.getCheckedRadioButtonId();
+
+            radioSeverityButton=(RadioButton)findViewById(selectSeverity);
+            radioCauseButton=(RadioButton)findViewById(selectCause);
+
             //Change number to SMS gateway number
-            smsManager.sendTextMessage("+639268247123", null, mydate + "/" + Double.toString(longitude) + "/" + Double.toString(latitude) + "/" + input1.getText().toString() + "/" +input2.getText().toString(), null, null);
+            smsManager.sendTextMessage("+639268247123", null, mydate + "/" + Double.toString(longitude) + "/" + Double.toString(latitude) + "/" + radioSeverityButton.getText().toString() + "/" + radioCauseButton.getText().toString(), null, null);
             Toast.makeText(this, "Message send!", Toast.LENGTH_SHORT).show();
 
                     startActivity(new Intent(MainActivity.this, MapsActivity.class));

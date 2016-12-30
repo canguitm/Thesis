@@ -20,31 +20,85 @@
         android:onClick="onSendClick" />
 
     <ListView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/messages"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/send"
-        android:layout_alignEnd="@+id/send"
         android:background="#cdeede"
-        android:layout_above="@+id/input1" />
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:visibility="invisible" />
 
-    <EditText
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/input1"
-        android:hint="severity"
-        android:layout_above="@+id/input2"
-        android:layout_alignEnd="@+id/send" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/input2"
-        android:hint="cause"
-        android:layout_above="@+id/send"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/severity_of_traffic"
+        android:id="@+id/textView"
+        android:layout_alignParentTop="true"
         android:layout_alignParentStart="true" />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/severity"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentLeft="true">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/light"
+            android:id="@+id/light" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/moderate"
+            android:id="@+id/moderate" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/heavy"
+            android:id="@+id/heavy" />
+    </RadioGroup>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/cause_of_traffic"
+        android:id="@+id/textView2"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/severity"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="20dp" />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/cause"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView2"
+        android:layout_alignParentLeft="true">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="weather"
+            android:id="@+id/weather" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="accident"
+            android:id="@+id/accident" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="undetermined"
+            android:id="@+id/undetermined" />
+    </RadioGroup>
 
 </RelativeLayout>

@@ -48,8 +48,8 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                         Toast.LENGTH_LONG).show();
             }
 
-            MainActivity inst = MainActivity.instance();
-            inst.updateInbox(smsMessageStr);
+            //MainActivity inst = MainActivity.instance();
+            //inst.updateInbox(smsMessageStr);
             MapsActivity.update_location();
         }
     }
