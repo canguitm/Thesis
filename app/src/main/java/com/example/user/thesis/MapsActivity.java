@@ -6,7 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
@@ -16,10 +19,12 @@ import android.support.v4.content.ContextCompat;
 import android.telephony.SmsMessage;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.identity.intents.Address;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -33,7 +38,10 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
@@ -47,7 +55,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Marker mCurrLocationMarker;
     LocationRequest mLocationRequest;
     private Button btn;
-
+    static Double getLong, getLat;
+    static DatabaseHelper myDb;
 
 
     @Override
@@ -71,6 +80,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startActivity(new Intent(MapsActivity.this, MainActivity.class));
             }
         });
+        myDb = new DatabaseHelper(this);
+
+    }
+
+    public void onMapSearch(View view) {
+        EditText locationSearch = (EditText) findViewById(R.id.editText);
+        String location = locationSearch.getText().toString();
+        List<android.location.Address> addressList = null;
+
+        if (location != null || !location.equals("")) {
+            Geocoder geocoder = new Geocoder(this);
+            try {
+                addressList = geocoder.getFromLocationName(location, 1);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            android.location.Address address = addressList.get(0);
+            //LatLng latLng = new LatLng(location.getLatitude(), address.getLongitude());
+            LatLng latLng = new LatLng(8.33, 124.33);
+            mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+        }
     }
 
 
@@ -103,6 +135,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+
+
+
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -124,6 +159,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         }
+        update_location();
 
     }
 
@@ -151,6 +187,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //Place current location marker
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        getLong = location.getLongitude();
+        getLat = location.getLatitude();
+
+
         //MarkerOptions markerOptions = new MarkerOptions();
         //markerOptions.position(latLng);
         //markerOptions.title("Current Position");
@@ -171,6 +211,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (mGoogleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
+
+    }
+
+    public static Double getLong()
+    {
+        return getLong;
+
+    }
+
+    public static Double getLat()
+    {
+        return getLat;
 
     }
 
@@ -246,15 +298,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public static void update_location()
-    {                                               // Instantiating MarkerOptions class
+    {
+        Cursor res = myDb.getAllData();
+        if (res.getCount() == 0){
+           // Toast.makeText(MapsActivity.this, "NO DATA FOUND!", Toast.LENGTH_SHORT).show();
+            //showMessage("No Data found", "Error");
+            //startActivity(new Intent(MainActivity.this, MapsActivity.class));
+        }
+
+        StringBuffer buffer = new StringBuffer();
+        while (res.moveToNext()){
+            Integer id = Integer.parseInt(res.getString(0));
+            String timestamp = res.getString(1);
+            Double lat = Double.parseDouble(res.getString(2));
+            Double lang = Double.parseDouble(res.getString(3));
+            String severity = res.getString(4);
+            String cause = res.getString(5);
+
+            LatLng found = new LatLng(lat,lang);
+            String details = "Date: " + timestamp + "     Cause: " + cause;
+            mMap.addMarker(new MarkerOptions().position(found).title(details));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(found,17));
+            Circle circle1 = mMap.addCircle(new CircleOptions()
+                    .center(new LatLng(lat, lang))
+                    .radius(300)
+                    .strokeColor(0xf44336)
+                    .fillColor(0x22f44336));
+        }
 
         //MarkerOptions options = new MarkerOptions();
         // Toast.makeText(getApplicationContext(), Lat.toString()+Lon.toString(), Toast.LENGTH_LONG).show();
-        double Lat1=SmsBroadcastReceiver.getLat();
-        double Lon2=SmsBroadcastReceiver.getLng();
-        LatLng found = new LatLng(Lat1,Lon2);
+       // double Lat1=SmsBroadcastReceiver.getLat();
+       // double Lon2=SmsBroadcastReceiver.getLng();
+
         //options.position(found);
         //Marker mapMarker=mMap.addMarker(options);
+        /*
         String details = "Date: " + SmsBroadcastReceiver.getTimestamp() + "     Cause: " + SmsBroadcastReceiver.getCause();
         mMap.addMarker(new MarkerOptions().position(found).title(details));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(found,17));
@@ -263,6 +342,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .radius(300)
                 .strokeColor(0xf44336)
                 .fillColor(0x22f44336));
+        /*
+        PolylineOptions polyOptions = new PolylineOptions();
+        polyOptions.color(ContextCompat.getColor(context, R.color.colorPrimary));
+        polyOptions.width(10);
+        polyOptions.add(startLatLng, latLngDestination);
+        */
 
     }
 }

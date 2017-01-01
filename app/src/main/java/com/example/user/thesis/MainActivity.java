@@ -1,12 +1,16 @@
 package com.example.user.thesis;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
@@ -24,12 +28,15 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
+    DatabaseHelper myDb;
+    Button btnViewAll;
     private RadioGroup radioSeverityGroup, radioCauseGroup;
     private RadioButton radioSeverityButton, radioCauseButton;
     private Button b_get;
     private TrackGPS gps;
     double longitude;
     double latitude;
+
 
     String mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
 
@@ -55,6 +62,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        myDb = new DatabaseHelper(this);
+        btnViewAll = (Button) findViewById(R.id.all);
+
+
         messages = (ListView) findViewById(R.id.messages);
         radioSeverityGroup=(RadioGroup)findViewById(R.id.severity);
         radioCauseGroup=(RadioGroup)findViewById(R.id.cause);
@@ -92,11 +103,44 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+    public void onAllClick(View view) {
+        Cursor res = myDb.getAllData();
+        if (res.getCount() == 0){
+            Toast.makeText(this, "FAIL!", Toast.LENGTH_SHORT).show();
+            showMessage("No Data found", "Error");
+            //startActivity(new Intent(MainActivity.this, MapsActivity.class));
+        }
+
+        StringBuffer buffer = new StringBuffer();
+        while (res.moveToNext()){
+            buffer.append("Id: " + res.getString(0) +"\n");
+            buffer.append("Timestamp: " + res.getString(1) +"\n");
+            buffer.append("Lat: " + res.getString(2) +"\n");
+            buffer.append("Lang: " + res.getString(3) +"\n");
+            buffer.append("Severity: " + res.getString(4) +"\n");
+            buffer.append("Cause: " + res.getString(5) +"\n\n");
+        }
+
+    //show all data
+        showMessage("Data", buffer.toString());
+
+
+    }
+
+    public void showMessage(String title, String Message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(Message);
+        builder.show();
+    }
 
     public void updateInbox(final String smsMessage) {
         arrayAdapter.insert(smsMessage, 0);
         arrayAdapter.notifyDataSetChanged();
     }
+
+
 
     public void getPermissionToReadSMS() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_SMS)
@@ -157,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
             radioCauseButton=(RadioButton)findViewById(selectCause);
 
             //Change number to SMS gateway number
-            smsManager.sendTextMessage("+639268247123", null, mydate + "/" + Double.toString(longitude) + "/" + Double.toString(latitude) + "/" + radioSeverityButton.getText().toString() + "/" + radioCauseButton.getText().toString(), null, null);
+            smsManager.sendTextMessage("+639268247123", null, mydate + "/" + Double.toString(MapsActivity.getLong()) + "/" + Double.toString(MapsActivity.getLat()) + "/" + radioSeverityButton.getText().toString() + "/" + radioCauseButton.getText().toString(), null, null);
             Toast.makeText(this, "Message send!", Toast.LENGTH_SHORT).show();
 
                     startActivity(new Intent(MainActivity.this, MapsActivity.class));

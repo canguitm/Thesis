@@ -12,6 +12,16 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="right|top"
+        android:text="@string/all"
+        android:id="@+id/all"
+        android:padding="10dp"
+        android:layout_centerHorizontal="true"
+        android:onClick="onAllClick"
+        android:layout_above="@+id/send" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/send"
         android:id="@+id/send"
         android:layout_alignParentBottom="true"

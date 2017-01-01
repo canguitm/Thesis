@@ -9,4 +9,7 @@
     <string name="heavy">Heavy</string>
     <string name="severity_of_traffic">Severity of Traffic</string>
     <string name="cause_of_traffic">Cause of Traffic</string>
+    <string name="all">all</string>
+    <string name="search_location_here">Search Location Here</string>
+    <string name="search">Search</string>
 </resources>
