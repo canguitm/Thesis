@@ -32,25 +32,15 @@ public class MainActivity extends AppCompatActivity {
     Button btnViewAll;
     private RadioGroup radioSeverityGroup, radioCauseGroup;
     private RadioButton radioSeverityButton, radioCauseButton;
-    private Button b_get;
-    private TrackGPS gps;
-    double longitude;
-    double latitude;
-
-
-    String mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
 
     ArrayList<String> smsMessagesList = new ArrayList<>();
     ListView messages;
     ArrayAdapter arrayAdapter;
-    EditText input;
     SmsManager smsManager = SmsManager.getDefault();
     private static MainActivity inst;
     private static final int READ_SMS_PERMISSIONS_REQUEST = 1;
 
-    public static MainActivity instance() {
-        return inst;
-    }
+    String mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
 
     @Override
     public void onStart() {
@@ -75,34 +65,9 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
             getPermissionToReadSMS();
-        } else {
-            refreshSmsInbox();
         }
-
-        //GPS THINGY
-
-        gps = new TrackGPS(MainActivity.this);
-
-        if(gps.canGetLocation()){
-
-
-            longitude = gps.getLongitude();
-            latitude = gps .getLatitude();
-
-        }
-        else
-        {
-
-            gps.showSettingsAlert();
-            gps = new TrackGPS(MainActivity.this);
-            longitude = gps.getLongitude();
-            latitude = gps .getLatitude();
-
-
-        }
-
-
     }
+
     public void onAllClick(View view) {
         Cursor res = myDb.getAllData();
         if (res.getCount() == 0){
@@ -135,13 +100,6 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
-    public void updateInbox(final String smsMessage) {
-        arrayAdapter.insert(smsMessage, 0);
-        arrayAdapter.notifyDataSetChanged();
-    }
-
-
-
     public void getPermissionToReadSMS() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -163,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
             if (grantResults.length == 1 &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Read SMS permission granted", Toast.LENGTH_SHORT).show();
-                refreshSmsInbox();
             } else {
                 Toast.makeText(this, "Read SMS permission denied", Toast.LENGTH_SHORT).show();
             }
@@ -171,20 +128,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-    }
-
-    public void refreshSmsInbox() {
-        ContentResolver contentResolver = getContentResolver();
-        Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null);
-        int indexBody = smsInboxCursor.getColumnIndex("body");
-        int indexAddress = smsInboxCursor.getColumnIndex("address");
-        if (indexBody < 0 || !smsInboxCursor.moveToFirst()) return;
-        arrayAdapter.clear();
-        do {
-            String str = "SMS From: " + smsInboxCursor.getString(indexAddress) +
-                    "\n" + smsInboxCursor.getString(indexBody) + "\n";
-            arrayAdapter.add(str);
-        } while (smsInboxCursor.moveToNext());
     }
 
     public void onSendClick(View view) {
@@ -209,9 +152,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        gps.stopUsingGPS();
-    }
 }

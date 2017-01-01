@@ -44,104 +44,18 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 String address = smsMessage.getOriginatingAddress();
 
                 StringTokenizer tokens = new StringTokenizer(smsBody, "/");
-                timestamp = tokens.nextToken();// this will contain "Fruit"
-                lng = Double.parseDouble(tokens.nextToken());// this will contain " they
-                lat = Double.parseDouble(tokens.nextToken());// this will contain "Fruit"
-                severity = tokens.nextToken();// this will contain " they
-                cause = tokens.nextToken();// this will contain " they
+                timestamp = tokens.nextToken();
+                lng = Double.parseDouble(tokens.nextToken());
+                lat = Double.parseDouble(tokens.nextToken());
+                severity = tokens.nextToken();
+                cause = tokens.nextToken();
 
-
-                //smsMessageStr += "SMS From: " + address + "\n";
-                smsMessageStr = timestamp + lng + lat +severity + cause;
-                Toast.makeText(context, "New Traffic Report Added",
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "New Traffic Report Added", Toast.LENGTH_LONG).show();
             }
-            //SmsMessage smsMessage;
-           DatabaseHelper.putSmsToDatabas(timestamp, lat, lng, severity, cause, context);
-           // MainActivity inst = MainActivity.instance();
-            //inst.putSmsToDatabas(lng, lat, context);
 
+            DatabaseHelper.putSmsToDatabase(timestamp, lat, lng, severity, cause, context);
             MapsActivity.update_location();
         }
     }
-/*
-    private void putSmsToDatabase( SmsMessage sms, Context context )
-    {
-        String smsBody = sms.getMessageBody().toString();
-        String address = sms.getOriginatingAddress();
-
-        StringTokenizer tokens = new StringTokenizer(smsBody, "/");
-        timestamp = tokens.nextToken();// this will contain "Fruit"
-        lng = Double.parseDouble(tokens.nextToken());// this will contain " they
-        lat = Double.parseDouble(tokens.nextToken());// this will contain "Fruit"
-        severity = tokens.nextToken();// this will contain " they
-        cause = tokens.nextToken();// this will contain " they
-
-        DatabaseHelper dataBaseHelper = new DatabaseHelper(context);
-
-        SQLiteDatabase db = dataBaseHelper.getWritableDatabase();
-
-        String mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime(    ));
-        // Create SMS row
-        ContentValues values = new ContentValues();
-
-        values.put("LAT", lat);
-        //values.put("SURNAME", mydate);
-        //values.put("LNG", lng);
-// values.put( READ, MESSAGE_IS_NOT_READ );
-// values.put( STATUS, sms.getStatus() );
-// values.put( TYPE, MESSAGE_TYPE_INBOX );
-// values.put( SEEN, MESSAGE_IS_NOT_SEEN );
-
-        db.insert("student_table", null, values);
-
-        db.close();
-
-    }
-    */
-
-    /*
-    public Cursor getData(int id) {
-        DatabaseHelper dataBaseHelper = new DatabaseHelper(context);
-
-        SQLiteDatabase db = dataBaseHelper.getReadableDatabase();
-      //  SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from student_table where id="+id+"", null );
-        return res;
-    }
-    */
-
-
-
-    public static String getTimestamp()
-    {
-        return timestamp;
-
-    }
-
-    public static Double getLng()
-    {
-        return lng;
-
-    }
-
-    public static Double getLat()
-    {
-        return lat;
-
-    }
-
-    public static String getSeverity()
-    {
-        return severity;
-
-    }
-
-    public static String getCause()
-    {
-        return cause;
-
-    }
-
 
 }

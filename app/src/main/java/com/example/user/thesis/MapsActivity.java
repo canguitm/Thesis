@@ -16,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.telephony.SmsMessage;
 import android.view.View;
 import android.widget.Button;
@@ -177,31 +178,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
 
-        /*Add Red circles
-        Circle circle1 = mMap.addCircle(new CircleOptions()
-                .center(new LatLng(8.484936392565173, 124.6505355834961))
-                .radius(300)
-                .strokeColor(0xf44336)
-                .fillColor(0x22f44336));
-        */
-
         //Place current location marker
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         getLong = location.getLongitude();
         getLat = location.getLatitude();
-
-
-        //MarkerOptions markerOptions = new MarkerOptions();
-        //markerOptions.position(latLng);
-        //markerOptions.title("Current Position");
-        //markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-        //mCurrLocationMarker = mMap.addMarker(markerOptions);
-
-        /*Centrio Marker
-        LatLng centrio = new LatLng(8.484936392565173, 124.6505355834961);
-        mMap.addMarker(new MarkerOptions().position(centrio).title("Marker in Centrio"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(centrio));
-        */
 
         //move map camera
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -319,11 +299,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String details = "Date: " + timestamp + "     Cause: " + cause;
             mMap.addMarker(new MarkerOptions().position(found).title(details));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(found,17));
-            Circle circle1 = mMap.addCircle(new CircleOptions()
-                    .center(new LatLng(lat, lang))
-                    .radius(300)
-                    .strokeColor(0xf44336)
-                    .fillColor(0x22f44336));
+
+
+            if (severity.equalsIgnoreCase("Light")) {
+                Circle circle1 = mMap.addCircle(new CircleOptions()
+                        .center(new LatLng(lat, lang))
+                        .radius(300)
+                        .strokeColor(0x4caf50)
+                        .fillColor(0x224caf50));
+            }
+            else if (severity.equalsIgnoreCase("Moderate")) {
+                Circle circle2 = mMap.addCircle(new CircleOptions()
+                        .radius(300)
+                        .strokeColor(0xffeb3b)
+                        .fillColor(0x22ffeb3b));
+            }
+            else if (severity.equalsIgnoreCase("Heavy")) {
+                Circle circle3 = mMap.addCircle(new CircleOptions()
+                        .center(new LatLng(lat, lang))
+                        .radius(300)
+                        .strokeColor(0xf44336)
+                        .fillColor(0x22f44336));
+            }
+            else{
+                Circle circle4 = mMap.addCircle(new CircleOptions()
+                        .center(new LatLng(lat, lang))
+                        .radius(300)
+                        .strokeColor(0x9c27b0)
+                        .fillColor(0x229c27b0));
+            }
         }
 
         //MarkerOptions options = new MarkerOptions();
